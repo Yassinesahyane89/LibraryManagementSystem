@@ -10,7 +10,7 @@ public class DatabaseConnection {
     private static final String PASSWORD = "";
     // JDBC variables for managing the connection
     private static Connection connection;
-    public static void main(String[] args) {
+    public static Connection getConnection() {
 
         if (connection == null) {
             try {
@@ -21,5 +21,6 @@ public class DatabaseConnection {
                 System.err.println("Error connecting to the database: " + e.getMessage());
             }
         }
+        return connection;
     }
 }
