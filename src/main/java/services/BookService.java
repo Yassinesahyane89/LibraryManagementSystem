@@ -86,4 +86,36 @@ public class BookService {
             }
         }
     }
+    public boolean removeBook(String isbn) {
+        Connection connection = DatabaseConnection.getConnection();
+        if (connection == null) {
+            System.err.println("Failed to connect to the database.");
+            return false;
+        }
+
+        try {
+            String sql = "DELETE FROM books WHERE isbn=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, isbn);
+
+            int rowsDeleted = statement.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Book removed successfully");
+                return true;
+            } else {
+                System.err.println("Error removing book with ISBN: " + isbn);
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing the database connection: " + e.getMessage());
+            }
+        }
+    }
 }

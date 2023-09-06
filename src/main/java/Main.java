@@ -12,7 +12,8 @@ public class Main {
             System.out.println("Library Management System Menu:");
             System.out.println("1. Add a Book");
             System.out.println("2. Update a Book");
-            System.out.println("3. Exit");
+            System.out.println("3. Remove a Book");
+            System.out.println("4. Exit");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -43,6 +44,12 @@ public class Main {
                     }
                     break;
                 case 3:
+                    // Remove a book
+                    System.out.print("Enter ISBN of the book to remove: ");
+                    String isbnToRemove = scanner.next();
+                    bookService.removeBook(isbnToRemove);
+                    break;
+                case 4:
                     // Exit the program
                     scanner.close();
                     System.exit(0);
