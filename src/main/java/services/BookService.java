@@ -48,4 +48,42 @@ public class BookService {
             }
         }
     }
+
+    public boolean updateBook(Book book) {
+        Connection connection = DatabaseConnection.getConnection();
+        if (connection == null) {
+            System.err.println("Failed to connect to the database.");
+            return false;
+        }
+
+        try {
+            String sql = "UPDATE books SET title=?, author=?, status=?, copies=?, borrowedCopies=? WHERE isbn=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, book.getTitle());
+            statement.setString(2, book.getAuthor());
+            statement.setString(3, book.getStatus());
+            statement.setInt(4, book.getCopies());
+            statement.setInt(5, book.getBorrowedCopies());
+            statement.setString(6, book.getIsbn());
+
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Book updated successfully: " + book.getTitle());
+                return true;
+            } else {
+                System.err.println("Error updating book: " + book.getTitle());
+                return false;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            return false;
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing the database connection: " + e.getMessage());
+            }
+        }
+    }
 }

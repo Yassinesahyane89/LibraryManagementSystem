@@ -11,7 +11,8 @@ public class Main {
         while (true) {
             System.out.println("Library Management System Menu:");
             System.out.println("1. Add a Book");
-            System.out.println("2. Exit");
+            System.out.println("2. Update a Book");
+            System.out.println("3. Exit");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -23,6 +24,25 @@ public class Main {
                     bookService.addNewBook(newBook);
                     break;
                 case 2:
+                    // Update a book
+                    System.out.print("Enter ISBN of the book to update: ");
+                    String isbnToUpdate = scanner.next();
+                    Book bookToUpdate = bookService.findBookByIsbn(isbnToUpdate);
+
+                    if (bookToUpdate != null) {
+                        System.out.println("Previous book data:");
+                        System.out.println(bookToUpdate);
+
+                        System.out.println("Enter new data:");
+                        Book updatedBook = createBookFromUserInput(scanner);
+
+                        // Update the book with new data
+                        bookService.updateBook(updatedBook);
+                    } else {
+                        System.out.println("Book with ISBN " + isbnToUpdate + " not found.");
+                    }
+                    break;
+                case 3:
                     // Exit the program
                     scanner.close();
                     System.exit(0);
