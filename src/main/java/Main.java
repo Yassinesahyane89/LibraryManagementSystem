@@ -13,7 +13,8 @@ public class Main {
             System.out.println("1. Add a Book");
             System.out.println("2. Update a Book");
             System.out.println("3. Remove a Book");
-            System.out.println("4. Exit");
+            System.out.println("4. View all Books");
+            System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -36,8 +37,6 @@ public class Main {
 
                         System.out.println("Enter new data:");
                         Book updatedBook = createBookFromUserInput(scanner);
-
-                        // Update the book with new data
                         bookService.updateBook(updatedBook);
                     } else {
                         System.out.println("Book with ISBN " + isbnToUpdate + " not found.");
@@ -50,6 +49,21 @@ public class Main {
                     bookService.removeBook(isbnToRemove);
                     break;
                 case 4:
+                    // View all books
+                    List<Book> allBooks = bookService.getAllBooks();
+                    if (!allBooks.isEmpty()) {
+                        System.out.println("List of All Books:");
+                        int i =1;
+                        for (Book book : allBooks) {
+                            System.out.println("\nbook " + i + "\n");
+                            System.out.println(book);
+                            i++;
+                        }
+                    } else {
+                        System.out.println("No books found in the database.");
+                    }
+                    break;
+                case 5:
                     // Exit the program
                     scanner.close();
                     System.exit(0);

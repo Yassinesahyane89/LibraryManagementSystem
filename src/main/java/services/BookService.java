@@ -157,4 +157,40 @@ public class BookService {
             }
         }
     }
+
+    public List<Book> getAllBooks() {
+        List<Book> books = new ArrayList<>();
+        Connection connection = DatabaseConnection.getConnection();
+        if (connection == null) {
+            System.err.println("Failed to connect to the database.");
+            return books;
+        }
+
+        try {
+            String sql = "SELECT * FROM books";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String isbn = resultSet.getString("isbn");
+                String title = resultSet.getString("title");
+                String author = resultSet.getString("author");
+                String status = resultSet.getString("status");
+                int copies = resultSet.getInt("copies");
+                int borrowedCopies = resultSet.getInt("borrowedCopies");
+                int lostCopies = resultSet.getInt("lostCopies");
+
+                books.add(new Book(isbn, title, author, status, copies, borrowedCopies, lostCopies));
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing the database connection: " + e.getMessage());
+            }
+        }
+        return books;
+    }
 }
