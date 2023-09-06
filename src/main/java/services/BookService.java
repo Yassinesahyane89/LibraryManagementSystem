@@ -118,4 +118,43 @@ public class BookService {
             }
         }
     }
+
+    public Book findBookByIsbn(String isbn) {
+        Connection connection = DatabaseConnection.getConnection();
+        if (connection == null) {
+            System.err.println("Failed to connect to the database.");
+            return null;
+        }
+
+        try {
+            String sql = "SELECT * FROM books WHERE isbn=?";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setString(1, isbn);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+
+                String title = resultSet.getString("title");
+                String author = resultSet.getString("author");
+                String status = resultSet.getString("status");
+                int copies = resultSet.getInt("copies");
+                int borrowedCopies = resultSet.getInt("borrowedCopies");
+                int lostCopies = resultSet.getInt("lostCopies");
+
+                return new Book(isbn, title, author, status, copies, borrowedCopies,lostCopies);
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            return null;
+        } finally {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                System.err.println("Error closing the database connection: " + e.getMessage());
+            }
+        }
+    }
 }
