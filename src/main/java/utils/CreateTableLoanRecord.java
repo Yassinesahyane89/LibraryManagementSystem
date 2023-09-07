@@ -6,10 +6,8 @@ import java.sql.Statement;
 
 public class CreateTableLoanRecord {
     public static void main(String[] args) {
-        // Establish a database connection
         Connection connection = DatabaseConnection.getConnection();
 
-        // SQL statement to create a "loan_records" table
         String createTableSQL = "CREATE TABLE IF NOT EXISTS loan_records ("
                 + "loanId INT AUTO_INCREMENT PRIMARY KEY,"
                 + "Book_ISBN VARCHAR(13),"
@@ -21,10 +19,7 @@ public class CreateTableLoanRecord {
                 + ")";
 
         try {
-            // Create a Statement
             Statement statement = connection.createStatement();
-
-            // Execute the SQL statement to create the table
             statement.executeUpdate(createTableSQL);
 
             System.out.println("Table 'loan_records' created successfully");
