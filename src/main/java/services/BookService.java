@@ -259,7 +259,6 @@ public class BookService {
 
         return matchingBooks;
     }
-
     public boolean borrowBook(String isbn, String memberNumber) {
         Connection connection = DatabaseConnection.getConnection();
         if (connection == null) {
@@ -267,12 +266,12 @@ public class BookService {
             return false;
         }
 
+        MemberService memberService = new MemberService();
 
         try {
             // Check if the book with the provided ISBN exists and is available
             Book book = findBookByIsbn(isbn);
 
-            System.out.println(book);
             if (book == null) {
                 System.out.println("Book with ISBN " + isbn + " not found.");
                 return false;
@@ -280,7 +279,20 @@ public class BookService {
                 System.out.println("No available copies of the book with ISBN " + isbn + ".");
                 return false;
             }
-            System.out.println(isbn);
+
+            //check if the borrower
+            boolean borrowerExists = memberService.findMemberNumber(memberNumber);
+
+            if (!borrowerExists){
+                System.out.println("Borrower with memberNumber " + memberNumber + " not found.");
+                return false;
+            }
+
+            if (isBookAlreadyBorrowedByUser(isbn, memberNumber)) {
+                System.out.println("The user has already borrowed this book.");
+                return false;
+            }
+
             // Update the book's status to "Borrowed" and decrement available copies
             String updateSql = "UPDATE books SET copies = copies - 1, borrowedCopies = borrowedCopies + 1 WHERE isbn = ?";
             PreparedStatement updateStatement = connection.prepareStatement(updateSql);
@@ -295,6 +307,70 @@ public class BookService {
             insertStatement.executeUpdate();
 
             System.out.println("Book with ISBN " + isbn + " has been successfully borrowed.");
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Database error: " + e.getMessage());
+            return false;
+        }
+    }
+    // Check if the user already has an active loan for the same book
+    private boolean isBookAlreadyBorrowedByUser(String isbn, String memberNumber) throws SQLException {
+        Connection connection = DatabaseConnection.getConnection();
+
+        String query = "SELECT * FROM loan_records WHERE Book_ISBN = ? AND Borrower_MemberNumber = ? AND returnDate IS NULL";
+        PreparedStatement statement = connection.prepareStatement(query);
+        statement.setString(1, isbn);
+        statement.setString(2, memberNumber);
+
+        ResultSet resultSet = statement.executeQuery();
+
+        return resultSet.next();
+    }
+    public boolean returnBook(String isbn, String memberNumber) {
+        Connection connection = DatabaseConnection.getConnection();
+        if (connection == null) {
+            System.err.println("Failed to connect to the database.");
+            return false;
+        }
+
+        MemberService memberService = new MemberService();
+        try {
+            // Check if the book with the provided ISBN exists and is borrowed
+            Book book = findBookByIsbn(isbn);
+
+            if (book == null) {
+                System.out.println("Book with ISBN " + isbn + " not found.");
+                return false;
+            } else if (book.getCopies() <= 0) {
+                System.out.println("Book with ISBN " + isbn + " is not currently borrowed.");
+                return false;
+            }
+
+            //!book.getStatus().equalsIgnoreCase("Borrowed")
+
+            //check if the borrower
+            boolean borrower = memberService.findMemberNumber(memberNumber);
+
+            if (!borrower){
+                System.out.println("Borrower with memberNumber " + memberNumber + " not found.");
+                return false;
+            }
+
+            // Update the book's status to "Available" and increment available copies
+            String updateSql = "UPDATE books SET copies = copies + 1, borrowedCopies = borrowedCopies - 1 WHERE isbn = ?";
+            PreparedStatement updateStatement = connection.prepareStatement(updateSql);
+            updateStatement.setString(1, isbn);
+            updateStatement.executeUpdate();
+
+            // Record the return date in loan_records
+            // Update the loan record to set the return date
+            String updateLoanRecordSql = "UPDATE loan_records SET returnDate = NOW() WHERE Book_ISBN = ? AND Borrower_MemberNumber = ?";
+            PreparedStatement updateLoanRecordStatement = connection.prepareStatement(updateLoanRecordSql);
+            updateLoanRecordStatement.setString(1, isbn);
+            updateLoanRecordStatement.setString(2, memberNumber);
+            updateLoanRecordStatement.executeUpdate();
+
+            System.out.println("Book with ISBN " + isbn + " has been successfully returned.");
             return true;
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());

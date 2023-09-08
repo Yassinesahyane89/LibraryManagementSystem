@@ -1,6 +1,5 @@
 import models.Book;
 import services.BookService;
-import services.MemberService;
 import java.util.Scanner;
 import java.util.List;
 public class Main {
@@ -18,7 +17,8 @@ public class Main {
             System.out.println("6. Search by Title");
             System.out.println("7. Search by Author");
             System.out.println("8. Borrow a Book");
-            System.out.println("9. Exit");
+            System.out.println("9. retunr a Book");
+            System.out.println("10. Exit");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -136,6 +136,22 @@ public class Main {
                     }
                     break;
                 case 9:
+                    // Return a book
+                    System.out.print("Enter ISBN of the book to return: ");
+                    String isbnToReturn = scanner.next();
+
+                    System.out.print("Enter Member Number: ");
+                    String memberNumberToReturn = scanner.next();
+
+                    boolean returnSuccess = bookService.returnBook(isbnToReturn, memberNumberToReturn);
+
+                    if (returnSuccess) {
+                        System.out.println("Book has been successfully returned.");
+                    } else {
+                        System.out.println("Failed to return the book.");
+                    }
+                    break;
+                case 10:
                     // Exit the program
                     scanner.close();
                     System.exit(0);
