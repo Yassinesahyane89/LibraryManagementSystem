@@ -40,12 +40,6 @@ public class BookService {
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             return false;
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
     }
     public boolean updateBook(Book book) {
@@ -77,12 +71,6 @@ public class BookService {
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             return false;
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
     }
     public boolean removeBook(String isbn) {
@@ -109,12 +97,6 @@ public class BookService {
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             return false;
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
     }
     public Book findBookByIsbn(String isbn) {
@@ -147,12 +129,6 @@ public class BookService {
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             return null;
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
     }
     public List<Book> getAllBooks() {
@@ -181,12 +157,6 @@ public class BookService {
             }
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
         return books;
     }
@@ -217,12 +187,6 @@ public class BookService {
             }
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
 
         return availableBooks;
@@ -257,12 +221,6 @@ public class BookService {
             resultSet.close();
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
         return matchingBooks;
     }
@@ -297,12 +255,6 @@ public class BookService {
             resultSet.close();
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
 
         return matchingBooks;
@@ -320,7 +272,7 @@ public class BookService {
             // Check if the book with the provided ISBN exists and is available
             Book book = findBookByIsbn(isbn);
 
-
+            System.out.println(book);
             if (book == null) {
                 System.out.println("Book with ISBN " + isbn + " not found.");
                 return false;
@@ -330,13 +282,13 @@ public class BookService {
             }
             System.out.println(isbn);
             // Update the book's status to "Borrowed" and decrement available copies
-            String updateSql = "UPDATE books SET copies = 11, borrowedCopies = 4 WHERE isbn = ?";
+            String updateSql = "UPDATE books SET copies = copies - 1, borrowedCopies = borrowedCopies + 1 WHERE isbn = ?";
             PreparedStatement updateStatement = connection.prepareStatement(updateSql);
             updateStatement.setString(1, isbn);
             updateStatement.executeUpdate();
 
             // Record borrower information
-            String insertSql = "INSERT INTO loan_records (Book_ISBN, Borrower_MemberNumber, loanDater, returnDate) VALUES (?, ?, ?, NOW())";
+            String insertSql = "INSERT INTO loan_records (Book_ISBN, Borrower_MemberNumber, loanDate) VALUES (?, ?, NOW())";
             PreparedStatement insertStatement = connection.prepareStatement(insertSql);
             insertStatement.setString(1, isbn);
             insertStatement.setString(2, memberNumber);
@@ -347,12 +299,6 @@ public class BookService {
         } catch (SQLException e) {
             System.err.println("Database error: " + e.getMessage());
             return false;
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Error closing the database connection: " + e.getMessage());
-            }
         }
     }
 }
