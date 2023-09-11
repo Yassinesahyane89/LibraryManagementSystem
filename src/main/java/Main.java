@@ -1,5 +1,6 @@
 import models.Book;
 import services.BookService;
+import services.StatisticsService;
 import java.util.Scanner;
 import java.util.List;
 public class Main {
@@ -18,7 +19,8 @@ public class Main {
             System.out.println("7. Search by Author");
             System.out.println("8. Borrow a Book");
             System.out.println("9. retunr a Book");
-            System.out.println("10. Exit");
+            System.out.println("10. library statistics");
+            System.out.println("11. Exit");
             System.out.print("Enter your choice: ");
 
             int choice = scanner.nextInt();
@@ -152,6 +154,12 @@ public class Main {
                     }
                     break;
                 case 10:
+                    // Generate library statistics
+                    StatisticsService statisticsService = new StatisticsService();
+                    statisticsService.generateLibraryStatistics();
+                    break;
+
+                case 11:
                     // Exit the program
                     scanner.close();
                     System.exit(0);
@@ -222,5 +230,4 @@ public class Main {
             }
         }
     }
-
 }
